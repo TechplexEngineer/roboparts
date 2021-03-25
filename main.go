@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/techplexengineer/gorm-roboparts/controllers/project"
+	"github.com/techplexengineer/gorm-roboparts/controllers/user"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"net/http"
@@ -40,6 +42,21 @@ func main() {
 	static.Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	static.Methods(http.MethodGet)
 	r.HandleFunc("/", controllers.Home)
+
+	//User
+	r.HandleFunc("/login", user.Login)
+	r.HandleFunc("/logout", user.Logout)
+	r.HandleFunc("/register", user.Register)
+	r.HandleFunc("/leave", user.DeleteAccount)
+	r.HandleFunc("/dashboard", user.Dashboard)
+	r.HandleFunc("/user/edit", user.ModifyAccount)
+
+	//Project
+	r.HandleFunc("/projects", project.List)
+	r.HandleFunc("/project/new", project.Create).Methods(http.MethodGet, http.MethodPost)
+	r.HandleFunc("/project/:id", project.Read).Methods(http.MethodGet)
+	r.HandleFunc("/project/:id", project.Update).Methods(http.MethodPost)
+	r.HandleFunc("/project/:id", project.Delete).Methods(http.MethodDelete)
 
 	err = http.ListenAndServe(":8090", r)
 	if err != nil {
