@@ -1,19 +1,21 @@
 package project
 
-import "net/http"
+import (
+	"github.com/labstack/echo/v4"
+)
 
-func Create(res http.ResponseWriter, req *http.Request) {
-
+func Create(c echo.Context) error {
+	return nil
 }
-func Read(res http.ResponseWriter, req *http.Request) {
-
+func Read(c echo.Context) error {
+	return nil
 }
-func Update(res http.ResponseWriter, req *http.Request) {
-
+func Update(c echo.Context) error {
+	return nil
 }
-func Delete(res http.ResponseWriter, req *http.Request) {
-
+func Delete(c echo.Context) error {
+	return nil
 }
-func List(res http.ResponseWriter, req *http.Request) {
-
+func List(c echo.Context) error {
+	return nil
 }

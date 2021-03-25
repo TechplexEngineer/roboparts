@@ -1,13 +1,13 @@
 package controllers
 
 import (
-	"github.com/techplexengineer/gorm-roboparts/helpers"
+	"github.com/labstack/echo/v4"
 	"net/http"
 )
 
-func Home(res http.ResponseWriter, req *http.Request) {
+func Home(c echo.Context) error {
 
 	data := map[string]interface{}{}
 
-	helpers.DoRender(res, req, "home.html", data)
+	return c.Render(http.StatusOK, "home.html", data)
 }

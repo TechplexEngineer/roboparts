@@ -1,36 +1,38 @@
 package user
 
-import "net/http"
+import (
+	"github.com/labstack/echo/v4"
+)
 
 //read
-func Dashboard(res http.ResponseWriter, req *http.Request) {
-
+func Dashboard(c echo.Context) error {
+	return nil
 }
 
-func Login(res http.ResponseWriter, req *http.Request) {
-
+func Login(c echo.Context) error {
+	return nil
 }
 
-func Logout(res http.ResponseWriter, req *http.Request) {
-
+func Logout(c echo.Context) error {
+	return nil
 }
 
 //create
-func Register(res http.ResponseWriter, req *http.Request) {
-
+func Register(c echo.Context) error {
+	return nil
 }
 
 //update
-func ModifyAccount(res http.ResponseWriter, req *http.Request) {
-
+func ModifyAccount(c echo.Context) error {
+	return nil
 }
 
 //delete
-func DeleteAccount(res http.ResponseWriter, req *http.Request) {
-
+func DeleteAccount(c echo.Context) error {
+	return nil
 }
 
-//list
-func ListUsers(res http.ResponseWriter, req *http.Request) {
-
+//list -- might be better placed in /admin
+func ListUsers(c echo.Context) error {
+	return nil
 }
