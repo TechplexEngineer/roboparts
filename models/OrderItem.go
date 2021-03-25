@@ -8,7 +8,7 @@ import (
 // Represents a line item in an order from a vendor.
 type OrderItem struct {
 	gorm.Model
-	Quantity    int     `json:"quantity"`
+	Quantity    int64   `json:"quantity"`
 	Description string  `json:"description"`
 	UnitCost    int64   `json:"unitCost"`
 	Notes       string  `json:"notes"`
@@ -18,13 +18,13 @@ type OrderItem struct {
 	Order       Order   `json:"order"`
 	PartID      uint    `json:"partId"`
 	Part        Part    `json:"part"`
-
-	//def total_cost
-	//	unit_cost * quantity
-	//end
 }
 
 func (o OrderItem) String() string {
 	jo, _ := json.Marshal(o)
 	return string(jo)
+}
+
+func (o OrderItem) TotalCost() int64 {
+	return o.UnitCost * o.Quantity
 }

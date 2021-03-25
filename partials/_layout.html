@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+	{{ template "header" }}
+	<body class="d-flex flex-column h-100">
+		{{ template "navbar" . }}
+
+		<main class="flex-shrink-0 pt-2">
+    		{{ block "content" . }}
+
+			<div class="container">
+				<h1 class="mt-5">Default Content</h1>
+			</div>
+
+    		{{ end }}
+		</main>
+
+	{{ template "footer" }}
+	</body>
+</html>

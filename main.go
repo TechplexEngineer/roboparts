@@ -2,9 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/techplexengineer/gorm-roboparts/models"
+	"github.com/gorilla/mux"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"net/http"
+
+	"github.com/techplexengineer/gorm-roboparts/controllers"
+	"github.com/techplexengineer/gorm-roboparts/models"
 )
 
 func main() {
@@ -25,9 +29,21 @@ func main() {
 		&models.Order{},
 		&models.OrderItem{},
 		&models.Part{},
-		&models.Project{})
+		&models.Project{},
+	)
 	if err != nil {
-		panic(fmt.Errorf("migration error - %w", err))
+		panic(fmt.Errorf("failed to automigrate database - %w", err))
+	}
+
+	r := mux.NewRouter()
+	static := r.PathPrefix("/static/")
+	static.Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	static.Methods(http.MethodGet)
+	r.HandleFunc("/", controllers.Home)
+
+	err = http.ListenAndServe(":8090", r)
+	if err != nil {
+		panic(fmt.Errorf("server error - %w", err))
 	}
 
 }
