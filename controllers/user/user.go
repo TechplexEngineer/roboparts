@@ -2,37 +2,46 @@ package user
 
 import (
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 )
 
+type UserController struct {
+	db *gorm.DB
+}
+
+func New(db *gorm.DB) UserController {
+	return UserController{db: db}
+}
+
 //read
-func Dashboard(c echo.Context) error {
+func (o *UserController) Dashboard(c echo.Context) error {
 	return nil
 }
 
-func Login(c echo.Context) error {
+func (o *UserController) Login(c echo.Context) error {
 	return nil
 }
 
-func Logout(c echo.Context) error {
+func (o *UserController) Logout(c echo.Context) error {
 	return nil
 }
 
 //create
-func Register(c echo.Context) error {
+func (o *UserController) Register(c echo.Context) error {
 	return nil
 }
 
 //update
-func ModifyAccount(c echo.Context) error {
+func (o *UserController) ModifyAccount(c echo.Context) error {
 	return nil
 }
 
 //delete
-func DeleteAccount(c echo.Context) error {
+func (o *UserController) DeleteAccount(c echo.Context) error {
 	return nil
 }
 
 //list -- might be better placed in /admin
-func ListUsers(c echo.Context) error {
+func (o *UserController) ListUsers(c echo.Context) error {
 	return nil
 }
