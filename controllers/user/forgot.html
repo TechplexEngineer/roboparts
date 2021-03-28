@@ -1,0 +1,55 @@
+{{define "content"}}
+    <style>
+        .form-signin {
+            width: 100%;
+            max-width: 430px;
+            padding: 15px;
+            margin: auto;
+        }
+
+        .form-signin .form-control {
+            position: relative;
+            box-sizing: border-box;
+            height: auto;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        .form-signin .form-control:focus {
+            z-index: 2;
+        }
+        .form-signin input {
+            margin-bottom: -1px;
+            border-radius: 0;
+        }
+
+        .form-signin input:first-of-type {
+            margin-bottom: 10px;
+            border-radius: .25rem;
+        }
+
+    </style>
+    <div class="container">
+
+        <form class="form-signin" action="{{pathFor `forgot_action`}}" method="post">
+
+            <h1 class="h3 mb-3 fw-normal text-center">Forgot</h1>
+
+            <label for="inputCode" class="visually-hidden">Username or Email</label>
+            <input type="text" name="username" id="inputCode" class="form-control" placeholder="Username or Email" required autofocus>
+
+            <a class="mt-2 w-100 btn btn-lg btn-primary" type="submit">Send Password Reset</a>
+
+            <div class="row text-muted mt-3">
+                <div class="col">
+                    <a href="{{pathFor "login"}}" class="text-muted">Login</a>
+                </div>
+                <div class="col text-end">
+                    <a href="{{pathFor "register"}}" class="text-muted">Register</a>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+{{end}}

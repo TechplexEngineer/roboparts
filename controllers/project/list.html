@@ -1,0 +1,33 @@
+{{define "content"}}
+  <div class="container">
+    <a href="{{pathFor `project_new`}}" class="btn btn-success float-end">Create</a>
+    <h1>Project List</h1>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          {{ range .columns }}
+            <th>{{.}}</th>
+          {{ end }}
+          <th>
+            Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+          {{range $proj := .projects}}
+            <tr>
+            {{ range $col  := $.columns }}
+              <td>{{member $proj $col}}</td>
+            {{ end }}
+              <td style="white-space: nowrap">
+                <a href="{{ pathFor "project" (member $proj `ID`)}}" class="btn btn-warning btn-sm">View</a>
+                <a href="{{ pathFor "project_edit" (member $proj `ID`)}}" class="btn btn-info btn-sm">Edit</a>
+                <a href="{{ pathFor "project_delete" (member $proj `ID`)}}" class="btn btn-danger btn-sm">Delete</a>
+              </td>
+            </tr>
+          {{end}}
+
+      </tbody>
+    </table>
+  </div>
+{{end}}

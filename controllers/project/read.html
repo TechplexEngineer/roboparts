@@ -1,0 +1,9 @@
+{{define "content"}}
+  <div class="container">
+    <a href="{{pathFor `projects`}}" class="btn btn-success float-end">All Projects</a>
+    <h1>Project: {{.project.Name}}</h1>
+    <pre>
+      {{.project}}
+    </pre>
+  </div>
+{{end}}

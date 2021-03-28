@@ -76,6 +76,20 @@ func LoadBaseTemplates() (*template.Template, error) {
 
 			return strings.TrimSpace(ss), nil
 		},
+		"member": func(s interface{}, col string) (string, error) {
+
+			marshal, err := json.Marshal(s)
+			if err != nil {
+				return "", err
+			}
+			var data map[string]interface{}
+			err = json.Unmarshal(marshal, &data)
+			if err != nil {
+				return "", err
+			}
+
+			return fmt.Sprintf("%v", data[col]), nil
+		},
 	}
 
 	tmpl := template.New("_layout.html")

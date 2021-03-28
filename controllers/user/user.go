@@ -3,45 +3,45 @@ package user
 import (
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
+	"net/http"
 )
 
-type UserController struct {
+type Controller struct {
 	db *gorm.DB
 }
 
-func New(db *gorm.DB) UserController {
-	return UserController{db: db}
+func New(db *gorm.DB) Controller {
+	return Controller{db: db}
 }
 
 //read
-func (o *UserController) Dashboard(c echo.Context) error {
-	return nil
+func (o *Controller) Dashboard(c echo.Context) error {
+	return c.Render(http.StatusOK, "dashboard.html", nil)
 }
 
-func (o *UserController) Login(c echo.Context) error {
-	return nil
+func (o *Controller) Login(c echo.Context) error {
+	return c.Render(http.StatusOK, "login.html", nil)
 }
 
-func (o *UserController) Logout(c echo.Context) error {
-	return nil
+func (o *Controller) Logout(c echo.Context) error {
+	return c.Render(http.StatusOK, "logout.html", nil)
+}
+
+func (o *Controller) Forgot(c echo.Context) error {
+	return c.Render(http.StatusOK, "forgot.html", nil)
 }
 
 //create
-func (o *UserController) Register(c echo.Context) error {
-	return nil
+func (o *Controller) Register(c echo.Context) error {
+	return c.Render(http.StatusOK, "register.html", nil)
 }
 
 //update
-func (o *UserController) ModifyAccount(c echo.Context) error {
-	return nil
+func (o *Controller) EditAccount(c echo.Context) error {
+	return c.Render(http.StatusOK, "account.html", nil)
 }
 
 //delete
-func (o *UserController) DeleteAccount(c echo.Context) error {
-	return nil
-}
-
-//list -- might be better placed in /admin
-func (o *UserController) ListUsers(c echo.Context) error {
-	return nil
+func (o *Controller) DeleteAccount(c echo.Context) error {
+	return c.Render(http.StatusOK, "delete.html", nil)
 }
