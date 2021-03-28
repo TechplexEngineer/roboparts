@@ -19,7 +19,6 @@ func (o *Controller) Create(c echo.Context) error {
 	return c.Render(http.StatusOK, "create.html", nil)
 }
 func (o *Controller) Read(c echo.Context) error {
-	c.Param("id")
 	project := models.Project{}
 	o.db.Find(&project, c.Param("id"))
 	data := map[string]interface{}{
@@ -28,7 +27,13 @@ func (o *Controller) Read(c echo.Context) error {
 	return c.Render(http.StatusOK, "read.html", data)
 }
 func (o *Controller) Update(c echo.Context) error {
-	return c.Render(http.StatusOK, "update.html", nil)
+	project := models.Project{}
+	o.db.Find(&project, c.Param("id"))
+	data := map[string]interface{}{
+		"projectType": models.Project{},
+		"project":     project,
+	}
+	return c.Render(http.StatusOK, "update.html", data)
 }
 func (o *Controller) Delete(c echo.Context) error {
 	return c.Render(http.StatusOK, "delete.html", nil)
