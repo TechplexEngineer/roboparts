@@ -1,12 +1,10 @@
 package models
 
-import (
-	"gorm.io/gorm"
-)
+import "encoding/json"
 
 // COTSPart is represents a single off the shelf part
 type COTSPart struct {
-	gorm.Model
+	Common
 	Name       string `json:"name"`
 	PartNumber string `json:"part_number"`
 	QtyPerUnit int    `json:"qty_per_unit"`
@@ -17,4 +15,7 @@ type COTSPart struct {
 	Vendor     Vendor `json:"vendor"`
 }
 
-type COTSParts []COTSPart
+func (o COTSPart) String() string {
+	jo, _ := json.Marshal(o)
+	return string(jo)
+}

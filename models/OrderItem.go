@@ -2,12 +2,11 @@ package models
 
 import (
 	"encoding/json"
-	"gorm.io/gorm"
 )
 
 // Represents a line item in an order from a vendor.
 type OrderItem struct {
-	gorm.Model
+	Common
 	Quantity    int64   `json:"quantity"`
 	Description string  `json:"description"`
 	UnitCost    int64   `json:"unitCost"`

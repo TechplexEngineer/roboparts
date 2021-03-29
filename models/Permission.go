@@ -2,11 +2,10 @@ package models
 
 import (
 	"encoding/json"
-	"gorm.io/gorm"
 )
 
 type Permission struct {
-	gorm.Model
+	Common
 	Name        string
 	Description string
 	Users       []User `json:"users" gorm:"many2many:permissions_users;"`

@@ -2,11 +2,10 @@ package models
 
 import (
 	"encoding/json"
-	"gorm.io/gorm"
 )
 
 type Role struct {
-	gorm.Model
+	Common
 	Name        string       `json:"name"`
 	Description string       `json:"description"`
 	Users       []User       `json:"users"       gorm:"many2many:roles_users;"`
