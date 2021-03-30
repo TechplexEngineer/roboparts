@@ -6,10 +6,18 @@ import (
 	"fmt"
 	"github.com/spf13/cast"
 	"html/template"
+	"log"
 	"math"
+	"reflect"
 	"strings"
 	"time"
 )
+
+type FormField struct {
+	Name      string
+	Data      interface{}
+	InputType string
+}
 
 // for development we want to load the templates for each request
 // for production we should cache the templates
@@ -90,16 +98,36 @@ func LoadBaseTemplates() (*template.Template, error) {
 
 			return fmt.Sprintf("%v", data[col]), nil
 		},
-		"members": func(s interface{}) (map[string]interface{}, error) {
+
+		"members": func(s interface{}) (map[string]FormField, error) {
 
 			marshal, err := json.Marshal(s)
 			if err != nil {
 				return nil, err
 			}
-			var data map[string]interface{}
-			err = json.Unmarshal(marshal, &data)
+
+			var conversion map[string]interface{}
+			err = json.Unmarshal(marshal, &conversion)
 			if err != nil {
 				return nil, err
+			}
+			data := map[string]FormField{}
+			for name, field := range conversion {
+
+				fie := FormField{
+					Name: "name",
+					Data: field,
+				}
+
+				f, ok := reflect.TypeOf(s).FieldByName(name)
+				if ok {
+					// if the field has a gorm tag
+					if len(f.Tag.Get("form_type")) > 0 {
+						fie.InputType = f.Tag.Get("form_type")
+					}
+					log.Printf("%s Tag: %s", name, string(f.Tag))
+				}
+				data[name] = fie
 			}
 
 			return data, nil

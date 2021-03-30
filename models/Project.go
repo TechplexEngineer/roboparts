@@ -2,11 +2,10 @@ package models
 
 import (
 	"encoding/json"
-	"gorm.io/gorm"
 )
 
 type Project struct {
-	gorm.Model
+	Common
 	Name       string  `json:"name"`
 	PartPrefix string  `json:"part_prefix"`
 	Archived   bool    `json:"archived"`

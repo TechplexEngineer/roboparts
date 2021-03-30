@@ -2,7 +2,6 @@ package models
 
 import (
 	"encoding/json"
-	"gorm.io/gorm"
 )
 
 // Part represents an item used in a project. It can represent
@@ -10,7 +9,7 @@ import (
 // Type ["part", "assembly", "COTS"] //@todo may want to add optional vendor
 // ParentPart a pointer to prevent errors with recursive type
 type Part struct {
-	gorm.Model
+	Common
 	PartNumber     string  `json:"part_number"`
 	Type           string  `json:"type"`
 	Name           string  `json:"name"`

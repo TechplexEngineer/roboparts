@@ -2,12 +2,11 @@ package models
 
 import (
 	"encoding/json"
-	"gorm.io/gorm"
 	"time"
 )
 
 type Order struct {
-	gorm.Model
+	Common
 	Status     string      `json:"status"`
 	OrderedAt  time.Time   `json:"ordered_at"`
 	PaidForBy  string      `json:"paid_for_by"`

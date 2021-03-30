@@ -2,12 +2,11 @@ package models
 
 import (
 	"encoding/json"
-	"gorm.io/gorm"
 )
 
 // Vendor is a company that sells COTS parts
 type Vendor struct {
-	gorm.Model
+	Common
 	Name       string     `json:"name"`
 	PartPrefix string     `json:"part_prefix"`
 	Notes      string     `json:"notes"`

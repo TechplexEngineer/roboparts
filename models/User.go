@@ -2,11 +2,10 @@ package models
 
 import (
 	"encoding/json"
-	"gorm.io/gorm"
 )
 
 type User struct {
-	gorm.Model
+	Common
 	Username             string       `json:"username"`
 	Email                string       `json:"email"`
 	PasswordHash         string       `json:"password_hash"`

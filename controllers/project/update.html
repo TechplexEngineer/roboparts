@@ -1,7 +1,13 @@
 {{define "content"}}
   <div class="container">
     <a href="{{pathFor `projects`}}" class="btn btn-success float-end">All Projects</a>
-    <h1>Edit Project {name}</h1>
+    <h1>Edit Project: {{.project.Name}}</h1>
     <p>Build web apps fast</p>
+    {{ range $k, $v := members .projectType }}
+      <div class="mb-3">
+        <label for="exampleFormControlInput1" class="form-label">{{$k}}</label>
+        <input type="email" class="form-control" value="{{$v}}">
+      </div>
+    {{end}}
   </div>
 {{end}}
