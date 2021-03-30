@@ -2,18 +2,17 @@ package main
 
 import (
 	"fmt"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/gommon/log"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 	"html/template"
 	"io"
 	"os"
 	"path"
 	"runtime"
 	"strings"
-
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-	"github.com/labstack/gommon/log"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 
 	"github.com/techplexengineer/gorm-roboparts/controllers"
 	"github.com/techplexengineer/gorm-roboparts/controllers/project"
@@ -172,6 +171,26 @@ func main() {
 	if len(port) < 1 {
 		port = "8090"
 	}
+
+	db.Create(&models.Part{
+		PartNumber:     "R21_Test",
+		Type:           "Part",
+		Name:           "Blake's Fav Hammer",
+		Notes:          "Some Notes",
+		Status:         "Status",
+		SourceMaterial: "N/A",
+		HaveMaterial:   false,
+		Quantity:       "4",
+		CutLength:      "",
+		Priority:       0,
+		DrawingCreated: false,
+		Project: models.Project{
+			Name:       "Robot 2021",
+			PartPrefix: "R21",
+			Archived:   false,
+			Notes:      "Sample Robot Project",
+		},
+	})
 
 	e.Logger.Fatal(e.Start(":" + port))
 
