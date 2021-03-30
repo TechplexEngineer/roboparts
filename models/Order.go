@@ -3,7 +3,6 @@ package models
 import (
 	"encoding/json"
 	"github.com/google/uuid"
-	"gorm.io/gorm"
 	"time"
 )
 
@@ -15,7 +14,7 @@ type Order struct {
 	TaxCost    int64       `json:"tax_cost"`
 	Notes      string      `json:"notes"`
 	OrderItems []OrderItem `json:"order_items"`
-	VendorId   *uuid.UUID  `json:"vendorId"`
+	VendorId   *uuid.UUID  `json:"vendorId;type:uuid;default:uuid_generate_v4()"`
 	Vendor     *Vendor     `json:"vendor"`
 	Projects   []*Project  `json:"projects" gorm:"many2many:projects_orders;"`
 
@@ -40,7 +39,7 @@ func (o Order) String() string {
 	return string(jo)
 }
 
-func (o *Order) BeforeCreate(tx *gorm.DB) (err error) {
-	o.ID = uuid.New()
-	return
-}
+//func (o *Order) BeforeCreate(tx *gorm.DB) (err error) {
+//	o.ID = uuid.New()
+//	return
+//}

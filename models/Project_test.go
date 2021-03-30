@@ -68,11 +68,11 @@ func TestOrderCreate(t *testing.T) {
 		t.Fatalf("Unable to migrate Project - %s", err)
 	}
 
-	db.Create(&Order{
-		Status:    "Open",
-		OrderedAt: nil,
-		PaidForBy: "",
-		TaxCost:   0,
-		Notes:     "",
-	})
+	//db.Create(&Order{
+	//	Status:    "Open",
+	//	OrderedAt: nil,
+	//	PaidForBy: "",
+	//	TaxCost:   0,
+	//	Notes:     "",
+	//})
 }

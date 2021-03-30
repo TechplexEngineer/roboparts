@@ -14,7 +14,7 @@ type COTSPart struct {
 	UnitCost   int64     `json:"unit_cost"`
 	Link       string    `json:"link"`
 	Notes      string    `json:"notes"`
-	VendorID   uuid.UUID `json:"vendor_id"`
+	VendorID   uuid.UUID `json:"vendor_id;type:uuid;default:uuid_generate_v4()"`
 	Vendor     Vendor    `json:"vendor"`
 }
 

@@ -2,21 +2,22 @@ package models
 
 import (
 	"encoding/json"
+	"github.com/google/uuid"
 )
 
 // Represents a line item in an order from a vendor.
 type OrderItem struct {
 	Common
-	Quantity    int64   `json:"quantity"`
-	Description string  `json:"description"`
-	UnitCost    int64   `json:"unitCost"`
-	Notes       string  `json:"notes"`
-	ProjectID   uint    `json:"projectId"`
-	Project     Project `json:"project"`
-	OrderID     uint    `json:"orderId"`
-	Order       Order   `json:"order"`
-	PartID      uint    `json:"partId"`
-	Part        Part    `json:"part"`
+	Quantity    int64     `json:"quantity"`
+	Description string    `json:"description"`
+	UnitCost    int64     `json:"unitCost"`
+	Notes       string    `json:"notes"`
+	ProjectID   uuid.UUID `json:"projectId;type:uuid"`
+	Project     Project   `json:"project"`
+	OrderID     uuid.UUID `json:"orderId;type:uuid"`
+	Order       Order     `json:"order"`
+	PartID      uuid.UUID `json:"partId;type:uuid"`
+	Part        Part      `json:"part"`
 }
 
 func (o OrderItem) String() string {
