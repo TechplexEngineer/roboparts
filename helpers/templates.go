@@ -90,6 +90,20 @@ func LoadBaseTemplates() (*template.Template, error) {
 
 			return fmt.Sprintf("%v", data[col]), nil
 		},
+		"members": func(s interface{}) (map[string]interface{}, error) {
+
+			marshal, err := json.Marshal(s)
+			if err != nil {
+				return nil, err
+			}
+			var data map[string]interface{}
+			err = json.Unmarshal(marshal, &data)
+			if err != nil {
+				return nil, err
+			}
+
+			return data, nil
+		},
 	}
 
 	tmpl := template.New("_layout.html")

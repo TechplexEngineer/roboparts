@@ -20,9 +20,9 @@
               <td>{{member $proj $col}}</td>
             {{ end }}
               <td style="white-space: nowrap">
-                <a href="{{ pathFor "project" (member $proj `ID`)}}" class="btn btn-warning btn-sm">View</a>
-                <a href="{{ pathFor "project_edit" (member $proj `ID`)}}" class="btn btn-info btn-sm">Edit</a>
-                <a href="{{ pathFor "project_delete" (member $proj `ID`)}}" class="btn btn-danger btn-sm">Delete</a>
+                <a href="{{ pathFor "project" (member $proj `ID`)}}" class="btn btn-warning btn-sm" title="View"><i class="bi bi-search"></i></a>
+                <a href="{{ pathFor "project_edit" (member $proj `ID`)}}" class="btn btn-info btn-sm" title="Edit"><i class="bi bi-pencil-square"></i></a>
+                <a href="{{ pathFor "project_delete" (member $proj `ID`)}}" class="btn btn-danger btn-sm" title="Delete"><i class="bi bi-trash-fill"></i></a>
               </td>
             </tr>
           {{end}}

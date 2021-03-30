@@ -1,9 +1,31 @@
 {{define "content"}}
   <div class="container">
-    <a href="{{pathFor `projects`}}" class="btn btn-success float-end">All Projects</a>
-    <h1>Project: {{.project.Name}}</h1>
-    <pre>
-      {{.project}}
-    </pre>
+    <div class="float-end">
+      <a href="{{pathFor `projects`}}" class="btn btn-success">New Part</a>
+      <a href="{{pathFor `projects`}}" class="btn btn-success">New Assembly</a>
+    </div>
+    <h1>{{.project.Name}} - All Parts &amp; Assemblies</h1>
+
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Part Number</th>
+          <th>Type</th>
+          <th>Name</th>
+          <th>Parent</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <h3>Metadata</h3>
+    <pre>{{jsonify .project}}</pre>
+    <ul>
+    {{ range $k,$v := (members .project) }}
+      <li>{{$k}}: {{$v}}</li>
+    {{ end }}
+    </ul>
   </div>
 {{end}}
