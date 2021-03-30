@@ -1,13 +1,14 @@
 package models
 
 import (
-	"gorm.io/gorm"
 	"time"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type Common struct {
-	gorm.Model
-	ID        uint `gorm:"primarykey"`
+	ID        uuid.UUID `gorm:"primarykey"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`

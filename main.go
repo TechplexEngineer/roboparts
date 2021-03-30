@@ -2,17 +2,18 @@ package main
 
 import (
 	"fmt"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-	"github.com/labstack/gommon/log"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 	"html/template"
 	"io"
 	"os"
 	"path"
 	"runtime"
 	"strings"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/gommon/log"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 
 	"github.com/techplexengineer/gorm-roboparts/controllers"
 	"github.com/techplexengineer/gorm-roboparts/controllers/project"
