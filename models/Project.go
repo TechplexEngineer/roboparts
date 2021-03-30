@@ -2,8 +2,6 @@ package models
 
 import (
 	"encoding/json"
-	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
 
 type Project struct {
@@ -19,9 +17,4 @@ type Project struct {
 func (o Project) String() string {
 	jo, _ := json.Marshal(o)
 	return string(jo)
-}
-
-func (o *Project) BeforeCreate(tx *gorm.DB) (err error) {
-	o.ID = uuid.New()
-	return
 }

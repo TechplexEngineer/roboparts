@@ -38,41 +38,59 @@ func freshDb(t *testing.T, db *gorm.DB) {
 	db.Exec("USE testdb;")
 }
 
-func TestProjectCreate(t *testing.T) {
+func TestModels(t *testing.T) {
 	db := getDb(t)
 	//cleanDb(t, db)
 	freshDb(t, db)
 
-	err := db.AutoMigrate(&Project{})
+	err := db.AutoMigrate(
+		&COTSPart{},
+		&Order{},
+		&OrderItem{},
+		&Part{},
+		&Permission{},
+		&Project{},
+		&Role{},
+		&User{},
+		&Vendor{},
+	)
 	if err != nil {
 		t.Fatalf("Unable to migrate Project - %s", err)
 	}
 
-	db.Create(&Project{
-		Name:       "Blake",
-		PartPrefix: "prefix",
-		Archived:   false,
-		Notes:      "notes",
-		Parts:      nil,
-		Orders:     nil,
+	db.Create(&User{
+		Username:    "techplex",
+		Email:       "techplex.engineer@gmail.com",
+		Password:    "",
+		Roles:       nil,
+		Permissions: nil,
 	})
-}
 
-func TestOrderCreate(t *testing.T) {
-	db := getDb(t)
-	//cleanDb(t, db)
-	freshDb(t, db)
-
-	err := db.AutoMigrate(&Order{})
-	if err != nil {
-		t.Fatalf("Unable to migrate Project - %s", err)
-	}
-
-	//db.Create(&Order{
-	//	Status:    "Open",
-	//	OrderedAt: nil,
-	//	PaidForBy: "",
-	//	TaxCost:   0,
-	//	Notes:     "",
+	//db.Create(&Project{
+	//	Name:       "Blake",
+	//	PartPrefix: "prefix",
+	//	Archived:   false,
+	//	Notes:      "notes",
+	//	Parts:      nil,
+	//	Orders:     nil,
 	//})
 }
+
+//func TestOrderCreate(t *testing.T) {
+//	db := getDb(t)
+//	//cleanDb(t, db)
+//	freshDb(t, db)
+//
+//	err := db.AutoMigrate(&Order{})
+//	if err != nil {
+//		t.Fatalf("Unable to migrate Project - %s", err)
+//	}
+//
+//	db.Create(&Order{
+//		Status:    "Open",
+//		OrderedAt: nil,
+//		PaidForBy: "",
+//		TaxCost:   0,
+//		Notes:     "",
+//	})
+//}
