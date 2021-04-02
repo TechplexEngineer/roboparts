@@ -1,18 +1,19 @@
 package main
 
 import (
+	"flag"
 	"fmt"
-	"html/template"
-	"io"
+	"gorm.io/driver/mysql"
+	"gorm.io/driver/sqlite"
 	"os"
-	"path"
-	"runtime"
 	"strings"
+	"time"
 
+	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
-	"gorm.io/driver/mysql"
+	"github.com/wader/gormstore/v2"
 	"gorm.io/gorm"
 
 	"github.com/techplexengineer/gorm-roboparts/controllers"
@@ -22,96 +23,35 @@ import (
 	"github.com/techplexengineer/gorm-roboparts/models"
 )
 
-const (
-	ReloadTemplates = true
-)
-
-type Template struct {
-	templates *template.Template
-}
-
-func getFrame(skipFrames int) runtime.Frame {
-	// We need the frame at index skipFrames+2, since we never want runtime.Callers and getFrame
-	targetFrameIndex := skipFrames + 2
-
-	// Set size to targetFrameIndex+2 to ensure we have room for one more caller than we need
-	programCounters := make([]uintptr, targetFrameIndex+2)
-	n := runtime.Callers(0, programCounters)
-
-	frame := runtime.Frame{Function: "unknown"}
-	if n > 0 {
-		frames := runtime.CallersFrames(programCounters[:n])
-		for more, frameIndex := true, 0; more && frameIndex <= targetFrameIndex; frameIndex++ {
-			var frameCandidate runtime.Frame
-			frameCandidate, more = frames.Next()
-			if frameIndex == targetFrameIndex {
-				frame = frameCandidate
-			}
-		}
-	}
-
-	return frame
-}
-
-func fileExists(filename string) bool {
-	info, err := os.Stat(filename)
-	if os.IsNotExist(err) {
-		return false
-	}
-	return !info.IsDir()
-}
-
-func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-
-	tmpl, err := helpers.LoadBaseTemplates()
-	if err != nil {
-		return fmt.Errorf("failed to load base templates - %w", err)
-	}
-	tmpl.Funcs(template.FuncMap{
-		// see https://echo.labstack.com/guide/routing/
-		// Echo#Reverse(name string, params ...interface{}
-		"pathFor": func(name string, params ...interface{}) string {
-			uri := c.Echo().Reverse(name, params...)
-			if len(uri) < 2 {
-				//@todo it would be nice to scan all templates for URLs to see if any of the route names are missing
-				log.Warnf("Unable to generate URL for '%s'", name)
-			}
-			return uri
-		},
-	})
-
-	cwd, _ := os.Getwd()
-	callingPkg := path.Dir(getFrame(2).File)
-
-	file := strings.TrimPrefix(callingPkg, cwd+string(os.PathSeparator))
-	file += string(os.PathSeparator) + name
-
-	tmpl, err = tmpl.ParseFiles(file)
-	if err != nil {
-		log.Printf("failed to load %s templates - %s", file, err)
-		return fmt.Errorf("failed to load %s templates - %w", file, err)
-	}
-
-	// Add global methods if data is a map
-	//if viewContext, isMap := data.(map[string]interface{}); isMap {
-	//	viewContext["reverse"] = c.Echo().Reverse
-	//	viewContext["routes"] = c.Echo().Routes()
-	//}
-
-	err = tmpl.Execute(w, data)
-	if err != nil {
-		log.Printf("error executing template %s - %s", file, err)
-	}
-
-	return err
-}
-
 func main() {
+
+	exampleCfg := flag.Bool("x", false, "print example config to stdout")
+
+	flag.Parse()
+
+	if *exampleCfg {
+		json, err := GetExampleConfigJson()
+		if err != nil {
+			log.Printf("Unable to get example config - %s", err)
+			os.Exit(1)
+		}
+		fmt.Printf("%s\n", json)
+		os.Exit(0)
+	}
+
+	cfg, err := GetConfig()
+	if err != nil {
+		panic(fmt.Errorf("unable to load config - %w", err))
+	}
+
 	// refer https://github.com/go-sql-driver/mysql#dsn-data-source-name for details
-	dsn := "user:password@tcp(127.0.0.1:3306)/testdb?charset=utf8mb4&parseTime=True&loc=Local"
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	//dbfile := "test.db"
-	//db, err := gorm.Open(sqlite.Open(dbfile), &gorm.Config{})
+	var db *gorm.DB
+	switch strings.ToLower(cfg.Database.Type) {
+	case "mysql":
+		db, err = gorm.Open(mysql.Open(cfg.Database.DSN), &gorm.Config{})
+	case "sqlite":
+		db, err = gorm.Open(sqlite.Open(cfg.Database.DSN), &gorm.Config{})
+	}
 	if err != nil {
 		panic(fmt.Errorf("failed to connect database - %w", err))
 	}
@@ -130,23 +70,32 @@ func main() {
 		panic(fmt.Errorf("failed to automigrate database - %w", err))
 	}
 
-	t := &Template{}
-
 	e := echo.New()
+	e.HideBanner = true
+
+	// rate is requests per second
+	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
+
+	store := gormstore.New(db, cfg.Session.AuthKey, cfg.Session.EncryptionKey)
+	e.Use(session.Middleware(store))
+	// db cleanup every hour
+	// close quit channel to stop cleanup
+	quit := make(chan struct{}) //@todo close periodic store cleanup
+	go store.PeriodicCleanup(1*time.Hour, quit)
 
 	// Middleware
-	//e.Use(middleware.Logger()) -- hide this for now
+	//e.Use(middleware.Logger()) // quite verbose
 	e.Use(middleware.Recover())
 
 	e.Logger.SetLevel(log.DEBUG)
-	e.Renderer = t
+	e.Renderer = &helpers.TemplateRenderer{}
 	e.Static("/static", "static")
 	e.GET("/", controllers.Home)
 
 	//User
 	uc := user.New(db)
-	e.GET("/login", uc.Login).Name = "login"
-	e.POST("/login", uc.Login).Name = "login_action"
+	e.GET("/login", uc.LoginGET).Name = "login"
+	e.POST("/login", uc.LoginPOST).Name = "login_action"
 	e.GET("/logout", uc.Logout).Name = "logout"
 	e.GET("/register", uc.Register).Name = "register"
 	e.POST("/register", uc.Register).Name = "register_action"
@@ -173,24 +122,14 @@ func main() {
 		port = "8090"
 	}
 
-	db.Create(&models.Part{
-		PartNumber:     "R21_Test",
-		Type:           "Part",
-		Name:           "Blake's Fav Hammer",
-		Notes:          "Some Notes",
-		Status:         "Status",
-		SourceMaterial: "N/A",
-		HaveMaterial:   false,
-		Quantity:       "4",
-		CutLength:      "",
-		Priority:       0,
-		DrawingCreated: false,
-		Project: models.Project{
-			Name:       "Robot 2021",
-			PartPrefix: "R21",
-			Archived:   false,
-			Notes:      "Sample Robot Project",
-		},
+	pwHash, err := helpers.HashPassword("password")
+	if err != nil {
+		panic(fmt.Errorf("unable to encrypt password - %w", err))
+	}
+	db.Create(&models.User{
+		Username:     "techplex",
+		Email:        "techplex.engineer@gmail.com",
+		PasswordHash: pwHash,
 	})
 
 	e.Logger.Fatal(e.Start(":" + port))
