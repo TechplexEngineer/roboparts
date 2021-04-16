@@ -122,15 +122,16 @@ func main() {
 		port = "8090"
 	}
 
-	pwHash, err := helpers.HashPassword("password")
-	if err != nil {
-		panic(fmt.Errorf("unable to encrypt password - %w", err))
-	}
-	db.Create(&models.User{
-		Username:     "techplex",
-		Email:        "techplex.engineer@gmail.com",
-		PasswordHash: pwHash,
-	})
+	//@todo only do this if there are no users
+	//pwHash, err := helpers.HashPassword("password")
+	//if err != nil {
+	//	panic(fmt.Errorf("unable to encrypt password - %w", err))
+	//}
+	//db.Create(&models.User{
+	//	Username:     "techplex",
+	//	Email:        "techplex.engineer+02@gmail.com",
+	//	PasswordHash: pwHash,
+	//})
 
 	e.Logger.Fatal(e.Start(":" + port))
 

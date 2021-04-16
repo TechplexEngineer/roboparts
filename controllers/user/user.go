@@ -25,10 +25,8 @@ func (o *Controller) LoginGET(c echo.Context) error {
 	return c.Render(http.StatusOK, "login.html", nil)
 }
 func (o *Controller) LoginPOST(c echo.Context) error {
-	username := c.FormValue("username")
-	password := c.FormValue("password")
 	user := models.User{}
-	result := o.db.Where("username = ?", username).Or("email = ?", username).Find(&user)
+	result := o.db.Where("username = ?", c.FormValue("username")).Or("email = ?", c.FormValue("username")).Find(&user)
 	if result.RowsAffected == 0 {
 		return c.Render(http.StatusOK, "login.html", map[string]interface{}{
 			"flash": []string{
@@ -38,23 +36,30 @@ func (o *Controller) LoginPOST(c echo.Context) error {
 	}
 	// one username matched
 	if result.RowsAffected == 1 {
-		if helpers.CheckPasswordHash(password, user.PasswordHash) {
+		if helpers.CheckPasswordHash(c.FormValue("password"), user.PasswordHash) {
 			// @todo it would be nice to set a flash message about success
 			// but echo doesn't have flash built in
-			c.Set("auth", true)
-			return c.Redirect(http.StatusTemporaryRedirect, c.Echo().Reverse("user_dashboard"))
+			err := helpers.CreateUserSession(c, user)
+			if err != nil {
+				c.Logger().Error(err)
+				return c.String(http.StatusInternalServerError, "Internal Server Error")
+			}
+
+			// Per MDN HTTP 303 says change VERBS to GET, body will be lost
+			// https://developer.mozilla.org/en-US/docs/Web/HTTP/Redirections#attr2
+			return c.Redirect(http.StatusSeeOther, c.Echo().Reverse("user_dashboard"))
 		}
 		return c.Render(http.StatusOK, "login.html", map[string]interface{}{
-			"flash": []string{
+			"flashMessages": []string{
 				"Invalid username or password",
 			},
 		})
 	}
 	if result.RowsAffected > 1 {
-		c.Logger().Errorf("Found more than one user for username: %s", username)
+		c.Logger().Errorf("Found more than one user for username: %s", user.Username)
 	}
 	return c.Render(http.StatusOK, "login.html", map[string]interface{}{
-		"flash": []string{
+		"flashMessages": []string{
 			"Internal server error. Please try again",
 		},
 	})
@@ -65,6 +70,7 @@ func (o *Controller) Logout(c echo.Context) error {
 }
 
 func (o *Controller) Forgot(c echo.Context) error {
+	helpers.SetFlash(c, "Test Message")
 	return c.Render(http.StatusOK, "forgot.html", nil)
 }
 

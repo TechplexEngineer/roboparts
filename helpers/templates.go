@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/labstack/echo/v4"
 	"github.com/spf13/cast"
 	"html/template"
 	"log"
@@ -21,7 +22,7 @@ type FormField struct {
 
 // for development we want to load the templates for each request
 // for production we should cache the templates
-func LoadBaseTemplates() (*template.Template, error) {
+func LoadBaseTemplates(c echo.Context) (*template.Template, error) {
 
 	funcMap := template.FuncMap{
 		"now": time.Now,
@@ -132,6 +133,21 @@ func LoadBaseTemplates() (*template.Template, error) {
 
 			return data, nil
 		},
+		// see https://echo.labstack.com/guide/routing/
+		// Echo#Reverse(name string, params ...interface{}
+		"pathFor": func(name string, params ...interface{}) string {
+			log.Print("pathfor")
+			uri := c.Echo().Reverse(name, params...)
+			if len(uri) < 2 {
+				//@todo it would be nice to scan all templates for URLs to see if any of the route names are missing
+				log.Printf("Unable to generate URL for '%s'", name)
+			}
+			return uri
+		},
+		"getFlash": func() []FlashMessage {
+			log.Print("getmsg")
+			return GetFlashMessages(c)
+		},
 	}
 
 	tmpl := template.New("_layout.html")
@@ -142,6 +158,7 @@ func LoadBaseTemplates() (*template.Template, error) {
 	var err error
 	tmpl, err = tmpl.ParseGlob(partialGlob)
 	if err != nil {
+		log.Printf("Here? - %s", err)
 		return nil, fmt.Errorf("unable to parse glob (%s): %w", partialGlob, err)
 	}
 

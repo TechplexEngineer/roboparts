@@ -7,7 +7,7 @@ import (
 type User struct {
 	Common
 	Username     string       `json:"username"`
-	Email        string       `json:"email"`
+	Email        string       `json:"email" gorm:"uniqueIndex"`
 	PasswordHash string       `json:"password_hash"`
 	Roles        []Role       `json:"roles"       gorm:"many2many:roles_users;"`
 	Permissions  []Permission `json:"permissions" gorm:"many2many:permissions_users;"`

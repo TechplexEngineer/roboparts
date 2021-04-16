@@ -5,6 +5,22 @@
 		{{ template "navbar" . }}
 
 		<main class="flex-shrink-0 pt-2">
+			{{ getFlash }}
+			{{ range .flash }}
+			<div class="alert alert-warning alert-dismissible fade show" role="alert">
+				<strong>
+					{{if .title}}
+						{{.title}}
+					{{else}}
+						{{.}}
+					{{end}}
+				</strong>
+				{{if .desc}}
+					{{.desc}}
+				{{end}}
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+			</div>
+			{{end}}
     		{{ block "content" . }}
 
 			<div class="container">
@@ -12,6 +28,9 @@
 			</div>
 
     		{{ end }}
+			<pre>
+				{{. | jsonify}}
+			</pre>
 		</main>
 
 	{{ template "footer" }}

@@ -17,24 +17,14 @@ type TemplateRenderer struct {
 }
 
 func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-
-	tmpl, err := LoadBaseTemplates()
+	log.Print("Here?")
+	tmpl, err := LoadBaseTemplates(c)
 	if err != nil {
+		log.Print("Herew?")
 		return fmt.Errorf("failed to load base templates - %w", err)
 	}
-	tmpl.Funcs(template.FuncMap{
-		// see https://echo.labstack.com/guide/routing/
-		// Echo#Reverse(name string, params ...interface{}
-		"pathFor": func(name string, params ...interface{}) string {
-			uri := c.Echo().Reverse(name, params...)
-			if len(uri) < 2 {
-				//@todo it would be nice to scan all templates for URLs to see if any of the route names are missing
-				log.Warnf("Unable to generate URL for '%s'", name)
-			}
-			return uri
-		},
-	})
 
+	log.Print("Here?")
 	cwd, _ := os.Getwd()
 	callingPkg := path.Dir(getFrame(2).File)
 
