@@ -45,7 +45,7 @@ func SetFlashMessage(c echo.Context, msg FlashMessage) error {
 	}
 	return nil
 }
-func GetFlashMessages(c echo.Context) []FlashMessage {
+func GetFlashMessages(c echo.Context) []interface{} {
 	sess, err := session.Get("flash", c)
 	if err != nil {
 		log.Print("HERE 1")
@@ -53,17 +53,17 @@ func GetFlashMessages(c echo.Context) []FlashMessage {
 	}
 
 	res := sess.Flashes()
-	messages := make([]FlashMessage, len(res))
-	log.Printf("HERE 2 -- %d - %#v", len(res), res)
-	for i, msg := range res {
-		messages[i] = msg.(FlashMessage)
-	}
+	//messages := make([]FlashMessage, len(res))
+	//log.Printf("HERE 2 -- %d - %#v", len(res), res)
+	//for i, msg := range res {
+	//	messages[i] = msg.(FlashMessage)
+	//}
 
 	err = sess.Save(c.Request(), c.Response())
 	if err != nil {
 		log.Print("HERE 3")
 		c.Logger().Error(fmt.Errorf("unable to remove flash messages - %w", err))
 	}
-	return messages
+	return res
 
 }

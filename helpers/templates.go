@@ -144,7 +144,7 @@ func LoadBaseTemplates(c echo.Context) (*template.Template, error) {
 			}
 			return uri
 		},
-		"getFlash": func() []FlashMessage {
+		"getFlash": func() []interface{} {
 			log.Print("getmsg")
 			return GetFlashMessages(c)
 		},
