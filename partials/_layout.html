@@ -7,7 +7,7 @@
 		<main class="flex-shrink-0 pt-2">
 
 			{{ range getFlash }}
-			<div class="alert alert-warning alert-dismissible fade show" role="alert">
+			<div class="alert {{if .Level}} alert-{{.Level}} {{ else }} alert-warning {{ end }} alert-dismissible fade show" role="alert">
 				<strong>
 					{{if .Title}}
 						{{.Title}}

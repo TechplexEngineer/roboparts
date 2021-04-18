@@ -23,12 +23,30 @@ func init() {
 	gob.Register(&FlashMessage{})
 }
 
-// SetFlash is a shorthand for setting a generic info message.
-func SetFlash(c echo.Context, msg string) error {
+// SetInfoFlash is a shorthand for setting a generic info message.
+func SetInfoFlash(c echo.Context, msg string) error {
 	return SetFlashMessage(c, FlashMessage{
 		Title: msg,
 		Desc:  "",
 		Level: "info",
+	})
+}
+
+// SetSuccessFlash is a shorthand for setting a generic success message.
+func SetSuccessFlash(c echo.Context, msg string) error {
+	return SetFlashMessage(c, FlashMessage{
+		Title: msg,
+		Desc:  "",
+		Level: "success",
+	})
+}
+
+// SetSuccessFlash is a shorthand for setting a generic success message.
+func SetWarningFlash(c echo.Context, msg string) error {
+	return SetFlashMessage(c, FlashMessage{
+		Title: msg,
+		Desc:  "",
+		Level: "warning",
 	})
 }
 
@@ -56,7 +74,7 @@ func SetFlashMessage(c echo.Context, msg FlashMessage) error {
 func GetFlashMessages(c echo.Context) []interface{} {
 	sess, err := session.Get("flash", c)
 	if err != nil {
-		log.Print("HERE 1")
+		log.Print("unable to get session")
 		return nil
 	}
 

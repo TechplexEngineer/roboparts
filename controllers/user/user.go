@@ -44,7 +44,7 @@ func (o *Controller) LoginPOST(c echo.Context) error {
 				c.Logger().Error(err)
 				return c.String(http.StatusInternalServerError, "Internal Server Error")
 			}
-			_ = helpers.SetFlash(c, "Successfully logged in")
+			_ = helpers.SetSuccessFlash(c, "Successfully logged in")
 			// Per MDN HTTP 303 says change VERBS to GET, body will be lost
 			// https://developer.mozilla.org/en-US/docs/Web/HTTP/Redirections#attr2
 			return c.Redirect(http.StatusSeeOther, c.Echo().Reverse("user_dashboard"))
@@ -67,8 +67,8 @@ func (o *Controller) LoginPOST(c echo.Context) error {
 
 func (o *Controller) Logout(c echo.Context) error {
 	helpers.Logout(c)
-	_ = helpers.SetFlash(c, "Successfully logged out")
-	return c.Redirect(http.StatusTemporaryRedirect, "/")
+	_ = helpers.SetSuccessFlash(c, "Successfully logged out")
+	return c.Redirect(http.StatusTemporaryRedirect, c.Echo().Reverse("home"))
 }
 
 func (o *Controller) Forgot(c echo.Context) error {
