@@ -18,21 +18,26 @@ type FlashMessage struct {
 }
 
 func init() {
+
+	// Session library stores flash messages using gob. So we must register the type for the gob encoding to work
 	gob.Register(&FlashMessage{})
 }
 
+// SetFlash is a shorthand for setting a generic info message.
 func SetFlash(c echo.Context, msg string) error {
 	return SetFlashMessage(c, FlashMessage{
-		Title: "msg",
+		Title: msg,
 		Desc:  "",
-		Level: "warning",
+		Level: "info",
 	})
 }
+
+// SetFlashMessage allows full control of the flash message.
+// See the definition of FlashMessage for allowable values of Level
 func SetFlashMessage(c echo.Context, msg FlashMessage) error {
 
 	sess, err := session.Get("flash", c)
 	if err != nil {
-		log.Print("HERE 10")
 		return fmt.Errorf("unable to get flash session - %w", err)
 	}
 
@@ -45,6 +50,9 @@ func SetFlashMessage(c echo.Context, msg FlashMessage) error {
 	}
 	return nil
 }
+
+// GetFlashMessages retrieves a []FlashMessages
+// Once retrieved the flash messages are removed from the list of messages to show.
 func GetFlashMessages(c echo.Context) []interface{} {
 	sess, err := session.Get("flash", c)
 	if err != nil {
@@ -53,6 +61,7 @@ func GetFlashMessages(c echo.Context) []interface{} {
 	}
 
 	res := sess.Flashes()
+	//@todo would be nice to return the correct type
 	//messages := make([]FlashMessage, len(res))
 	//log.Printf("HERE 2 -- %d - %#v", len(res), res)
 	//for i, msg := range res {

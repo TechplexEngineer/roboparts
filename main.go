@@ -90,7 +90,7 @@ func main() {
 	e.Logger.SetLevel(log.DEBUG)
 	e.Renderer = &helpers.TemplateRenderer{}
 	e.Static("/static", "static")
-	e.GET("/", controllers.Home)
+	e.GET("/", controllers.Home).Name = "Home"
 
 	//User
 	uc := user.New(db)

@@ -3,9 +3,9 @@ package helpers
 import (
 	"fmt"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/gommon/log"
 	"html/template"
 	"io"
+	"log"
 	"os"
 	"path"
 	"runtime"
@@ -17,14 +17,14 @@ type TemplateRenderer struct {
 }
 
 func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	log.Print("Here?")
+	log.Printf("Rendering template %s", name)
 	tmpl, err := LoadBaseTemplates(c)
 	if err != nil {
-		log.Print("Herew?")
-		return fmt.Errorf("failed to load base templates - %w", err)
+		err = fmt.Errorf("failed to load base templates - %w", err)
+		log.Print(err)
+		return err
 	}
 
-	log.Print("Here?")
 	cwd, _ := os.Getwd()
 	callingPkg := path.Dir(getFrame(2).File)
 

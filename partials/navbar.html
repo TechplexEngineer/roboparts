@@ -24,8 +24,18 @@
 
           <ul class="navbar-nav mb-2 mb-md-0 d-flex">
             <li class="nav-item">
-              <a class="nav-link" href="/login">Login / Register</a>
+
+              {{ if isLoggedIn }}
+                <a class="nav-link" href="/dashboard" title="dashboard">{{ getCurrentUser }}</a>
+              {{ else }}
+                <a class="nav-link" href="/login">Login / Register</a>
+              {{ end }}
             </li>
+            {{ if isLoggedIn }}
+            <li class="nav-item">
+                <a class="nav-link" href="/logout">Logout</a>
+            </li>
+            {{ end }}
 
           </ul>
 

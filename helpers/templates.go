@@ -136,7 +136,6 @@ func LoadBaseTemplates(c echo.Context) (*template.Template, error) {
 		// see https://echo.labstack.com/guide/routing/
 		// Echo#Reverse(name string, params ...interface{}
 		"pathFor": func(name string, params ...interface{}) string {
-			log.Print("pathfor")
 			uri := c.Echo().Reverse(name, params...)
 			if len(uri) < 2 {
 				//@todo it would be nice to scan all templates for URLs to see if any of the route names are missing
@@ -145,8 +144,13 @@ func LoadBaseTemplates(c echo.Context) (*template.Template, error) {
 			return uri
 		},
 		"getFlash": func() []interface{} {
-			log.Print("getmsg")
 			return GetFlashMessages(c)
+		},
+		"isLoggedIn": func() bool {
+			return IsLoggedIn(c)
+		},
+		"getCurrentUser": func() (string, error) {
+			return GetCurrentUser(c)
 		},
 	}
 
