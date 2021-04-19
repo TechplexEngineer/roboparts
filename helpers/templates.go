@@ -95,6 +95,8 @@ func LoadBaseTemplates(c echo.Context) (*template.Template, error) {
 		},
 
 		"members": getMembers,
+		//"getColumns": getColumns,
+
 		// see https://echo.labstack.com/guide/routing/
 		// Echo#Reverse(name string, params ...interface{}
 		"pathFor": func(name string, params ...interface{}) string {
@@ -132,10 +134,11 @@ func LoadBaseTemplates(c echo.Context) (*template.Template, error) {
 }
 
 type FormField struct {
-	Name      string
-	Data      interface{}
-	InputType string
-	Options   []FormFieldOption
+	Name       string
+	Data       interface{}
+	InputType  string
+	InputClass string
+	Options    []FormFieldOption
 }
 
 type FormFieldOption struct {
@@ -143,7 +146,6 @@ type FormFieldOption struct {
 	Value string // this could be interface{} but will be rendered to string by the template anyway
 }
 
-//not this only supports on level of struct nesting
 func getMembers(s interface{}) ([]FormField, error) {
 
 	data := []FormField{}
@@ -152,23 +154,36 @@ func getMembers(s interface{}) ([]FormField, error) {
 	v := reflect.ValueOf(s)
 	typeOfS := v.Type()
 	for i := 0; i < v.NumField(); i++ {
-		fmt.Printf("here")
 		//fmt.Printf("Field: %12s\t Type: %15s\t Value: %v\n", typeOfS.Field(i).Name, v.Field(i).Type(), v.Field(i).Interface())
 		fmt.Printf("Field: %-12s\t Type: %-15s\n", typeOfS.Field(i).Name, v.Field(i).Type())
 
+		uiTag := typeOfS.Field(i).Tag.Get("ui")
+		if uiTag == "-" {
+			log.Printf("skipping %s b/c %s", typeOfS.Field(i).Name, uiTag)
+			continue
+		}
+
 		ff := FormField{
-			Name:      typeOfS.Field(i).Name,
-			Data:      v.Field(i).Interface(),
-			InputType: "text",
+			Name:       typeOfS.Field(i).Name,
+			Data:       v.Field(i).Interface(),
+			InputType:  "text",
+			InputClass: "form-control",
 		}
 
 		switch v.Field(i).Type().Kind() {
+
 		case reflect.Bool:
 			ff.InputType = "checkbox"
+			ff.InputClass = "form-check-input"
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
 			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr,
 			reflect.Float32, reflect.Float64:
 			ff.InputType = "number"
+		case reflect.Slice, reflect.Array:
+			if v.Field(i).Type().String() != "uuid.UUID" {
+				log.Printf("Skipping Slice or array for field - %s", typeOfS.Field(i).Name)
+				continue
+			}
 		case reflect.String:
 			ff.InputType = "text"
 		case reflect.Struct:
@@ -193,11 +208,13 @@ func getMembers(s interface{}) ([]FormField, error) {
 			//fallthrough
 		case reflect.Map:
 			//fallthrough
-		case reflect.Slice, reflect.Array:
-			//fallthrough
 		default:
 			log.Printf("unsupported field with type %s", v.Field(i).Type().Kind())
 			ff.InputType = "text"
+		}
+
+		if uiTag == "textarea" {
+			ff.InputType = "textarea"
 		}
 
 		data = append(data, ff)
@@ -262,3 +279,7 @@ func getMembers(s interface{}) ([]FormField, error) {
 	//
 	//return data, nil
 }
+
+//func getColumns(s interface{}) {
+//	v := reflect.ValueOf(s)
+//}

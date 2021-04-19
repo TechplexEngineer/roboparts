@@ -9,7 +9,7 @@ type Project struct {
 	Name       string   `json:"name"`
 	PartPrefix string   `json:"part_prefix"`
 	Archived   bool     `json:"archived"`
-	Notes      string   `json:"notes"`
+	Notes      string   `json:"notes" ui:"textarea"`
 	Parts      []Part   `json:"parts"`
 	Orders     []*Order `json:"orders" gorm:"many2many:projects_orders;"`
 }

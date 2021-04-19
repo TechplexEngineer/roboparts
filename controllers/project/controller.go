@@ -41,18 +41,18 @@ func (o *Controller) List(c echo.Context) error {
 	projects := []models.Project{}
 	o.db.Find(&projects) //probably want to add a limit
 	data := map[string]interface{}{
-		//"columns": []string{
-		//	"ID",
-		//	"name",
-		//	"part_prefix",
-		//	"archived",
-		//	"notes",
-		//	"parts",
-		//	"orders",
-		//	"CreatedAt",
-		//	"UpdatedAt",
-		//	"DeletedAt",
-		//},
+		"columns": []string{
+			"ID",
+			"name",
+			"part_prefix",
+			"archived",
+			"notes",
+			"parts",
+			"orders",
+			"CreatedAt",
+			"UpdatedAt",
+			"DeletedAt",
+		},
 		"projects": projects,
 	}
 	return c.Render(http.StatusOK, "list.html", data)
