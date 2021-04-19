@@ -28,10 +28,9 @@ func (o *Controller) Read(c echo.Context) error {
 }
 func (o *Controller) Update(c echo.Context) error {
 	project := models.Project{}
-	o.db.Find(&project, c.Param("id"))
+	o.db.Where("id = ?", c.Param("id")).First(&project)
 	data := map[string]interface{}{
-		"projectType": models.Project{},
-		"project":     project,
+		"project": project,
 	}
 	return c.Render(http.StatusOK, "update.html", data)
 }
@@ -42,18 +41,18 @@ func (o *Controller) List(c echo.Context) error {
 	projects := []models.Project{}
 	o.db.Find(&projects) //probably want to add a limit
 	data := map[string]interface{}{
-		"columns": []string{
-			"ID",
-			"name",
-			"part_prefix",
-			"archived",
-			"notes",
-			"parts",
-			"orders",
-			"CreatedAt",
-			"UpdatedAt",
-			"DeletedAt",
-		},
+		//"columns": []string{
+		//	"ID",
+		//	"name",
+		//	"part_prefix",
+		//	"archived",
+		//	"notes",
+		//	"parts",
+		//	"orders",
+		//	"CreatedAt",
+		//	"UpdatedAt",
+		//	"DeletedAt",
+		//},
 		"projects": projects,
 	}
 	return c.Render(http.StatusOK, "list.html", data)

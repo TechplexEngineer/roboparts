@@ -59,11 +59,11 @@ func TestModels(t *testing.T) {
 	}
 
 	db.Create(&User{
-		Username:    "techplex",
-		Email:       "techplex.engineer@gmail.com",
-		Password:    "",
-		Roles:       nil,
-		Permissions: nil,
+		Username:     "techplex",
+		Email:        "techplex.engineer@gmail.com",
+		PasswordHash: "",
+		Roles:        nil,
+		Permissions:  nil,
 	})
 
 	//db.Create(&Project{

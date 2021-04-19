@@ -3,10 +3,12 @@
     <a href="{{pathFor `projects`}}" class="btn btn-success float-end">All Projects</a>
     <h1>Edit Project: {{.project.Name}}</h1>
     <p>Build web apps fast</p>
-    {{ range $k, $v := members .projectType }}
+{{/*    <pre>{{ members .project | jsonify }}</pre>*/}}
+
+    {{ range members .project }}
       <div class="mb-3">
-        <label for="exampleFormControlInput1" class="form-label">{{$k}}</label>
-        <input type="email" class="form-control" value="{{$v}}">
+        <label for="exampleFormControlInput1" class="form-label">{{.Name}}</label>
+        <input type="{{.InputType}}" class="form-control" value="{{.Data}}">
       </div>
     {{end}}
   </div>

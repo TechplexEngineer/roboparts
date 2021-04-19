@@ -14,12 +14,6 @@ import (
 	"time"
 )
 
-type FormField struct {
-	Name      string
-	Data      interface{}
-	InputType string
-}
-
 // for development we want to load the templates for each request
 // for production we should cache the templates
 func LoadBaseTemplates(c echo.Context) (*template.Template, error) {
@@ -100,39 +94,7 @@ func LoadBaseTemplates(c echo.Context) (*template.Template, error) {
 			return fmt.Sprintf("%v", data[col]), nil
 		},
 
-		"members": func(s interface{}) (map[string]FormField, error) {
-
-			marshal, err := json.Marshal(s)
-			if err != nil {
-				return nil, err
-			}
-
-			var conversion map[string]interface{}
-			err = json.Unmarshal(marshal, &conversion)
-			if err != nil {
-				return nil, err
-			}
-			data := map[string]FormField{}
-			for name, field := range conversion {
-
-				fie := FormField{
-					Name: "name",
-					Data: field,
-				}
-
-				f, ok := reflect.TypeOf(s).FieldByName(name)
-				if ok {
-					// if the field has a gorm tag
-					if len(f.Tag.Get("form_type")) > 0 {
-						fie.InputType = f.Tag.Get("form_type")
-					}
-					log.Printf("%s Tag: %s", name, string(f.Tag))
-				}
-				data[name] = fie
-			}
-
-			return data, nil
-		},
+		"members": getMembers,
 		// see https://echo.labstack.com/guide/routing/
 		// Echo#Reverse(name string, params ...interface{}
 		"pathFor": func(name string, params ...interface{}) string {
@@ -167,4 +129,136 @@ func LoadBaseTemplates(c echo.Context) (*template.Template, error) {
 	}
 
 	return tmpl, nil
+}
+
+type FormField struct {
+	Name      string
+	Data      interface{}
+	InputType string
+	Options   []FormFieldOption
+}
+
+type FormFieldOption struct {
+	Label string
+	Value string // this could be interface{} but will be rendered to string by the template anyway
+}
+
+//not this only supports on level of struct nesting
+func getMembers(s interface{}) ([]FormField, error) {
+
+	data := []FormField{}
+
+	//https://stackoverflow.com/a/57073506/429544
+	v := reflect.ValueOf(s)
+	typeOfS := v.Type()
+	for i := 0; i < v.NumField(); i++ {
+		fmt.Printf("here")
+		//fmt.Printf("Field: %12s\t Type: %15s\t Value: %v\n", typeOfS.Field(i).Name, v.Field(i).Type(), v.Field(i).Interface())
+		fmt.Printf("Field: %-12s\t Type: %-15s\n", typeOfS.Field(i).Name, v.Field(i).Type())
+
+		ff := FormField{
+			Name:      typeOfS.Field(i).Name,
+			Data:      v.Field(i).Interface(),
+			InputType: "text",
+		}
+
+		switch v.Field(i).Type().Kind() {
+		case reflect.Bool:
+			ff.InputType = "checkbox"
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr,
+			reflect.Float32, reflect.Float64:
+			ff.InputType = "number"
+		case reflect.String:
+			ff.InputType = "text"
+		case reflect.Struct:
+
+			_, ok := v.Field(i).Interface().(fmt.Stringer)
+			if !ok && v.Field(i).Type().String() != "gorm.DeletedAt" {
+				//fmt.Printf("Recursing into %s\n", typeOfS.Field(i).Name)
+				members, err := getMembers(v.Field(i).Interface())
+				if err != nil {
+					return nil, err
+				}
+				//fmt.Printf("found members: %#v\n", members)
+				for _, m := range members {
+					data = append(data, m)
+				}
+				continue
+			}
+			fmt.Printf("found string method for field %s, assuming text\n", typeOfS.Field(i).Name)
+			ff.InputType = "text"
+
+		case reflect.Interface, reflect.Ptr:
+			//fallthrough
+		case reflect.Map:
+			//fallthrough
+		case reflect.Slice, reflect.Array:
+			//fallthrough
+		default:
+			log.Printf("unsupported field with type %s", v.Field(i).Type().Kind())
+			ff.InputType = "text"
+		}
+
+		data = append(data, ff)
+
+	}
+
+	//v := reflect.ValueOf(s)
+	//
+	//for i := 0; i < v.NumField(); i++ {
+	//	f := v.Field(i)
+	//	t := reflect.TypeOf(f)
+	//	log.Printf("Field: %s - %s", f.Type(), t.Name())
+	//}
+	return data, nil
+
+	//// covert the thing (s) into a key:value map
+	//marshal, err := json.Marshal(s)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	////log.Printf("JSON: %s", marshal)
+	//
+	//var conversion map[string]interface{}
+	//err = json.Unmarshal(marshal, &conversion)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	////log.Printf("MAP: %#v", conversion)
+	//
+	//data := map[string]FormField{}
+	//for name, field := range conversion {
+	//	log.Printf("== Field: %s", name)
+	//	fie := FormField{
+	//		Name:      name,
+	//		Data:      field,
+	//		InputType: "text",
+	//	}
+	//
+	//	f, ok := reflect.TypeOf(s).FieldByName(name)
+	//	if !ok {
+	//		log.Printf("Field: %s is not ok", name)
+	//	} else {
+	//		log.Printf("Field: %s is %s", name, f.Type.Name())
+	//		if f.Type.Name() == "bool" {
+	//			log.Printf("field is bool! %s", name)
+	//		}
+	//
+	//		// if the field has a gorm tag
+	//		if len(f.Tag.Get("form_type")) > 0 {
+	//			fie.InputType = f.Tag.Get("form_type")
+	//		}
+	//		//log.Printf("%s Tag: %s", name, string(f.Tag))
+	//
+	//		if f.Tag.Get("ui") == "-" {
+	//			fie.InputType = "none"
+	//		}
+	//	}
+	//	data[name] = fie
+	//}
+	//
+	//return data, nil
 }
