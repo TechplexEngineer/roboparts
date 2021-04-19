@@ -79,23 +79,34 @@ func LoadBaseTemplates(c echo.Context) (*template.Template, error) {
 
 			return strings.TrimSpace(ss), nil
 		},
-		"member": func(s interface{}, col string) (string, error) {
-
-			marshal, err := json.Marshal(s)
-			if err != nil {
-				return "", err
-			}
-			var data map[string]interface{}
-			err = json.Unmarshal(marshal, &data)
-			if err != nil {
-				return "", err
-			}
-
-			return fmt.Sprintf("%v", data[col]), nil
-		},
+		//"member": func(s interface{}, col string) (string, error) {
+		//
+		//	marshal, err := json.Marshal(s)
+		//	if err != nil {
+		//		return "", err
+		//	}
+		//	var data map[string]interface{}
+		//	err = json.Unmarshal(marshal, &data)
+		//	if err != nil {
+		//		return "", err
+		//	}
+		//
+		//	return fmt.Sprintf("%v", data[col]), nil
+		//},
 
 		"members": getMembers,
-		//"getColumns": getColumns,
+		"getColumns": func(s interface{}) ([]FormField, error) {
+
+			// if there is no data, this might error... @todo
+			v := reflect.ValueOf(s)
+			//log.Printf("%#v", v.Index(0).Interface())
+			members, err := getMembers(v.Index(0).Interface())
+			if err != nil {
+				return nil, err
+			}
+			return members, nil
+			return nil, nil
+		},
 
 		// see https://echo.labstack.com/guide/routing/
 		// Echo#Reverse(name string, params ...interface{}
