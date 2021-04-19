@@ -123,11 +123,17 @@ func LoadBaseTemplates(c echo.Context) (*template.Template, error) {
 	tmpl = tmpl.Funcs(funcMap)
 
 	partialGlob := "partials/*.html"
-	var err error
-	tmpl, err = tmpl.ParseGlob(partialGlob)
+	tmpl, err := tmpl.ParseGlob(partialGlob)
 	if err != nil {
-		log.Printf("Here? - %s", err)
-		return nil, fmt.Errorf("unable to parse glob (%s): %w", partialGlob, err)
+		log.Printf("Error parsing partial templates - %s", err)
+		return nil, fmt.Errorf("unable to parse partial templates (%s): %w", partialGlob, err)
+	}
+
+	autoformGlob := "partials/autoform/*.html"
+	tmpl, err = tmpl.ParseGlob(autoformGlob)
+	if err != nil {
+		log.Printf("Error parsing autoform templates - %s", err)
+		return nil, fmt.Errorf("unable to parse autoform templates (%s): %w", partialGlob, err)
 	}
 
 	return tmpl, nil
