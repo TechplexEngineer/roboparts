@@ -50,6 +50,15 @@ func SetWarningFlash(c echo.Context, msg string) error {
 	})
 }
 
+// SetErrorFlash is a shorthand for setting a generic success message.
+func SetErrorFlash(c echo.Context, msg string) error {
+	return SetFlashMessage(c, FlashMessage{
+		Title: msg,
+		Desc:  "",
+		Level: "danger",
+	})
+}
+
 // SetFlashMessage allows full control of the flash message.
 // See the definition of FlashMessage for allowable values of Level
 func SetFlashMessage(c echo.Context, msg FlashMessage) error {

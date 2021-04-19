@@ -3,18 +3,20 @@ package main
 import (
 	"flag"
 	"fmt"
-	"gorm.io/driver/mysql"
-	"gorm.io/driver/sqlite"
+	"log"
 	"os"
 	"strings"
 	"time"
 
+	"gorm.io/driver/mysql"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/labstack/gommon/log"
 	"github.com/wader/gormstore/v2"
-	"gorm.io/gorm"
 
 	"github.com/techplexengineer/gorm-roboparts/controllers"
 	"github.com/techplexengineer/gorm-roboparts/controllers/project"
@@ -44,17 +46,27 @@ func main() {
 		panic(fmt.Errorf("unable to load config - %w", err))
 	}
 
+	dbConfig := &gorm.Config{}
+
 	// refer https://github.com/go-sql-driver/mysql#dsn-data-source-name for details
 	var db *gorm.DB
 	switch strings.ToLower(cfg.Database.Type) {
 	case "mysql":
-		db, err = gorm.Open(mysql.Open(cfg.Database.DSN), &gorm.Config{})
+		db, err = gorm.Open(mysql.Open(cfg.Database.DSN), dbConfig)
 	case "sqlite":
-		db, err = gorm.Open(sqlite.Open(cfg.Database.DSN), &gorm.Config{})
+		db, err = gorm.Open(sqlite.Open(cfg.Database.DSN), dbConfig)
 	}
 	if err != nil {
 		panic(fmt.Errorf("failed to connect database - %w", err))
 	}
+
+	newLogger := logger.New(log.New(os.Stdout, "\r\n", log.LstdFlags),
+		logger.Config{
+			SlowThreshold: time.Second,
+			LogLevel:      logger.Info,
+			Colorful:      false,
+		})
+	db.Session(&gorm.Session{Logger: newLogger})
 
 	// Migrate the schema
 	err = db.AutoMigrate(
@@ -87,7 +99,7 @@ func main() {
 	//e.Use(middleware.Logger()) // quite verbose
 	e.Use(middleware.Recover())
 
-	e.Logger.SetLevel(log.DEBUG)
+	//e.Logger.SetLevel(log.DEBUG)
 	e.Renderer = &helpers.TemplateRenderer{}
 	e.Static("/static", "static")
 	e.GET("/", controllers.Home).Name = "home"
@@ -129,10 +141,10 @@ func main() {
 	//}
 	//db.Create(&models.User{
 	//	Username:     "techplex",
-	//	Email:        "techplex.engineer+02@gmail.com",
+	//	Email:        "techplex.engineer@gmail.com",
 	//	PasswordHash: pwHash,
 	//})
 
-	e.Logger.Fatal(e.Start(":" + port))
+	e.Logger.Fatal(e.Start("localhost:" + port))
 
 }

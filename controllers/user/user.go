@@ -5,6 +5,7 @@ import (
 	"github.com/techplexengineer/gorm-roboparts/helpers"
 	"github.com/techplexengineer/gorm-roboparts/models"
 	"gorm.io/gorm"
+	"log"
 	"net/http"
 )
 
@@ -26,13 +27,12 @@ func (o *Controller) LoginGET(c echo.Context) error {
 }
 func (o *Controller) LoginPOST(c echo.Context) error {
 	user := models.User{}
+	//o.db.Debug()
 	result := o.db.Where("username = ?", c.FormValue("username")).Or("email = ?", c.FormValue("username")).Find(&user)
 	if result.RowsAffected == 0 {
-		return c.Render(http.StatusOK, "login.html", map[string]interface{}{
-			"flash": []string{
-				"User not found",
-			},
-		})
+		_ = helpers.SetErrorFlash(c, "Incorrect username or password")
+		log.Print("User not found")
+		return c.Render(http.StatusOK, "login.html", nil)
 	}
 	// one username matched
 	if result.RowsAffected == 1 {
@@ -49,24 +49,23 @@ func (o *Controller) LoginPOST(c echo.Context) error {
 			// https://developer.mozilla.org/en-US/docs/Web/HTTP/Redirections#attr2
 			return c.Redirect(http.StatusSeeOther, c.Echo().Reverse("user_dashboard"))
 		}
-		return c.Render(http.StatusOK, "login.html", map[string]interface{}{
-			"flashMessages": []string{
-				"Invalid username or password",
-			},
-		})
+		_ = helpers.SetErrorFlash(c, "Incorrect username or password")
+		log.Print("Incorrect Password")
+		return c.Render(http.StatusOK, "login.html", nil)
 	}
 	if result.RowsAffected > 1 {
 		c.Logger().Errorf("Found more than one user for username: %s", user.Username)
 	}
-	return c.Render(http.StatusOK, "login.html", map[string]interface{}{
-		"flashMessages": []string{
-			"Internal server error. Please try again",
-		},
-	})
+	_ = helpers.SetErrorFlash(c, "Incorrect username or password")
+	log.Print("Incorrect Username")
+	return c.Render(http.StatusOK, "login.html", nil)
 }
 
 func (o *Controller) Logout(c echo.Context) error {
-	helpers.Logout(c)
+	err := helpers.Logout(c)
+	if err != nil {
+		return err
+	}
 	_ = helpers.SetSuccessFlash(c, "Successfully logged out")
 	return c.Redirect(http.StatusTemporaryRedirect, c.Echo().Reverse("home"))
 }
