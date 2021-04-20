@@ -66,7 +66,7 @@ func TestModels(t *testing.T) {
 		Permissions:  nil,
 	})
 
-	//db.Create(&Project{
+	//db.CreateGET(&Project{
 	//	Name:       "Blake",
 	//	PartPrefix: "prefix",
 	//	Archived:   false,
@@ -86,7 +86,7 @@ func TestModels(t *testing.T) {
 //		t.Fatalf("Unable to migrate Project - %s", err)
 //	}
 //
-//	db.Create(&Order{
+//	db.CreateGET(&Order{
 //		Status:    "Open",
 //		OrderedAt: nil,
 //		PaidForBy: "",

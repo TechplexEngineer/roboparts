@@ -2,7 +2,6 @@
 	<div class="container">
 		<a href="{{pathFor `projects`}}" class="btn btn-success float-end">All Projects</a>
 		<h1>Edit Project: {{.project.Name}}</h1>
-        {{/*    <pre>{{ members .project | jsonify }}</pre>*/}}
 
 		<form action="{{ pathFor "project_edit" }}">
             {{ range members .project }}

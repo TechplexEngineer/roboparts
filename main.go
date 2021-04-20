@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -18,12 +19,25 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/wader/gormstore/v2"
 
+	"github.com/go-playground/validator"
 	"github.com/techplexengineer/gorm-roboparts/controllers"
 	"github.com/techplexengineer/gorm-roboparts/controllers/project"
 	"github.com/techplexengineer/gorm-roboparts/controllers/user"
 	"github.com/techplexengineer/gorm-roboparts/helpers"
 	"github.com/techplexengineer/gorm-roboparts/models"
 )
+
+type CustomValidator struct {
+	validator *validator.Validate
+}
+
+func (cv *CustomValidator) Validate(i interface{}) error {
+	log.Printf("Validate %#v", i)
+	if err := cv.validator.Struct(i); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	return nil
+}
 
 func main() {
 
@@ -85,6 +99,8 @@ func main() {
 	e := echo.New()
 	e.HideBanner = true
 
+	e.Validator = &CustomValidator{validator: validator.New()}
+
 	// rate is requests per second
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
 
@@ -120,9 +136,9 @@ func main() {
 
 	//Project
 	pc := project.New(db)
-	e.GET("/projects", pc.List).Name = "projects"
-	e.GET("/project/new", pc.Create).Name = "project_new"
-	e.POST("/project/new", pc.Create)
+	e.GET("/projects", pc.ListGET).Name = "projects"
+	e.GET("/project/new", pc.CreateGET).Name = "project_new"
+	e.POST("/project/new", pc.CreatePOST)
 	e.GET("/project/:id", pc.Read).Name = "project"
 	e.GET("/project/edit/:id", pc.Update).Name = "project_edit"
 	e.POST("/project/edit/:id", pc.Update)
@@ -139,7 +155,7 @@ func main() {
 	//if err != nil {
 	//	panic(fmt.Errorf("unable to encrypt password - %w", err))
 	//}
-	//db.Create(&models.User{
+	//db.CreateGET(&models.User{
 	//	Username:     "techplex",
 	//	Email:        "techplex.engineer@gmail.com",
 	//	PasswordHash: pwHash,

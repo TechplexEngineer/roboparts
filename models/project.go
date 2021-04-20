@@ -6,10 +6,10 @@ import (
 
 type Project struct {
 	Common
-	Name       string   `json:"name"`
-	PartPrefix string   `json:"part_prefix"`
-	Archived   bool     `json:"archived"`
-	Notes      string   `json:"notes" ui:"textarea"`
+	Name       string   `json:"name"        form:"Name"       validate:"required"`
+	PartPrefix string   `json:"part_prefix" form:"PartPrefix" validate:"required"`
+	Archived   bool     `json:"archived"    form:"Archived"`
+	Notes      string   `json:"notes"       form:"Notes"      ui:"textarea"`
 	Parts      []Part   `json:"parts"`
 	Orders     []*Order `json:"orders" gorm:"many2many:projects_orders;"`
 }

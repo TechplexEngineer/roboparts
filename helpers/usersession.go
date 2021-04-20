@@ -35,7 +35,7 @@ func GetCurrentUser(c echo.Context) (string, error) {
 	}
 	user, ok := sess.Values["username"]
 	if !ok {
-		log.Print("unable to access username property of session")
+		//log.Print("unable to access username property of session")
 		return "", nil
 	}
 

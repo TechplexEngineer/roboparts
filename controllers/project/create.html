@@ -1,7 +1,15 @@
 {{define "content"}}
-  <div class="container">
-    <a href="{{pathFor `projects`}}" class="btn btn-success float-end">All Projects</a>
-    <h1>Create a new Project</h1>
+	<div class="container">
+		<a href="{{pathFor `projects`}}" class="btn btn-success float-end">All Projects</a>
+		<h1>Create a new Project</h1>
 
-  </div>
+		<form action="{{ pathFor "project_new" }}" method="POST">
+            {{ range members .project }}
+                {{ template "afField" . }}
+            {{ end }}
+			<button type="submit" class="btn btn-success">Submit</button>
+			<a href="{{pathFor `projects`}}" class="btn btn-danger float-end">Cancel</a>
+		</form>
+
+	</div>
 {{end}}

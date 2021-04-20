@@ -3,32 +3,6 @@
     <a href="{{pathFor `project_new`}}" class="btn btn-success float-end">Create</a>
     <h1>Project List</h1>
 
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          {{ range (getColumns .projects) }}
-            <th>{{.Name}}</th>
-          {{ end }}
-          <th>
-            Actions
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-          {{range $proj := .projects}}
-            <tr>
-            {{ range (members $proj) }}
-              <td>{{.Data}}</td>
-            {{ end }}
-              <td style="white-space: nowrap">
-                <a href="{{ pathFor "project" $proj.ID}}" class="btn btn-warning btn-sm" title="View"><i class="bi bi-search"></i></a>
-                <a href="{{ pathFor "project_edit" $proj.ID}}" class="btn btn-info btn-sm" title="Edit"><i class="bi bi-pencil-square"></i></a>
-                <a href="{{ pathFor "project_delete" $proj.ID}}" class="btn btn-danger btn-sm" title="Delete"><i class="bi bi-trash-fill"></i></a>
-              </td>
-            </tr>
-          {{end}}
-
-      </tbody>
-    </table>
+    {{ template "afList" (createMap "data" .projects "type" "project") }}
   </div>
 {{end}}

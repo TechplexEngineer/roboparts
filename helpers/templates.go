@@ -127,6 +127,21 @@ func LoadBaseTemplates(c echo.Context) (*template.Template, error) {
 		"getCurrentUser": func() (string, error) {
 			return GetCurrentUser(c)
 		},
+
+		// args is a list of key, value pairs. Keys must be strings
+		"createMap": func(args ...interface{}) (map[string]interface{}, error) {
+
+			if len(args)%2 != 0 {
+				return nil, fmt.Errorf("number of args must be a multiple of 2")
+			}
+
+			data := map[string]interface{}{}
+			for i := 0; i < len(args); i += 2 {
+				data[args[i].(string)] = args[i+1]
+			}
+
+			return data, nil
+		},
 	}
 
 	tmpl := template.New("_layout.html")
@@ -144,7 +159,7 @@ func LoadBaseTemplates(c echo.Context) (*template.Template, error) {
 	tmpl, err = tmpl.ParseGlob(autoformGlob)
 	if err != nil {
 		log.Printf("Error parsing autoform templates - %s", err)
-		return nil, fmt.Errorf("unable to parse autoform templates (%s): %w", partialGlob, err)
+		return nil, fmt.Errorf("unable to parse autoform templates (%s): %w", autoformGlob, err)
 	}
 
 	return tmpl, nil
@@ -172,11 +187,11 @@ func getMembers(s interface{}) ([]FormField, error) {
 	typeOfS := v.Type()
 	for i := 0; i < v.NumField(); i++ {
 		//fmt.Printf("Field: %12s\t Type: %15s\t Value: %v\n", typeOfS.Field(i).Name, v.Field(i).Type(), v.Field(i).Interface())
-		fmt.Printf("Field: %-12s\t Type: %-15s\n", typeOfS.Field(i).Name, v.Field(i).Type())
+		//fmt.Printf("Field: %-12s\t Type: %-15s\n", typeOfS.Field(i).Name, v.Field(i).Type())
 
 		uiTag := typeOfS.Field(i).Tag.Get("ui")
 		if uiTag == "-" {
-			log.Printf("skipping %s b/c %s", typeOfS.Field(i).Name, uiTag)
+			//log.Printf("skipping %s b/c %s", typeOfS.Field(i).Name, uiTag)
 			continue
 		}
 
@@ -198,7 +213,7 @@ func getMembers(s interface{}) ([]FormField, error) {
 			ff.InputType = "number"
 		case reflect.Slice, reflect.Array:
 			if v.Field(i).Type().String() != "uuid.UUID" {
-				log.Printf("Skipping Slice or array for field - %s", typeOfS.Field(i).Name)
+				//log.Printf("Skipping Slice or array for field - %s", typeOfS.Field(i).Name)
 				continue
 			}
 		case reflect.String:
