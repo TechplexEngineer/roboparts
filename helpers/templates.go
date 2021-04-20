@@ -142,6 +142,23 @@ func LoadBaseTemplates(c echo.Context) (*template.Template, error) {
 
 			return data, nil
 		},
+		// check if the current field is valid
+		"isValid": func(fieldName string, valData map[string]string) (string, error) {
+			message, err := getValMessage(fieldName, valData)
+			if err != nil {
+				// the callers are currently logging
+				return "", err
+			}
+			log.Printf("isvalid %s %s - %#v", fieldName, message, valData)
+			if len(message) > 0 {
+				// is-invalid is a boostrap class that triggers the validation to show
+				return "is-invalid", nil
+			}
+			return "", nil
+
+		},
+		// get any validation message
+		"getValMessage": getValMessage,
 	}
 
 	tmpl := template.New("_layout.html")
@@ -163,6 +180,24 @@ func LoadBaseTemplates(c echo.Context) (*template.Template, error) {
 	}
 
 	return tmpl, nil
+}
+
+func getValMessage(fieldName string, valData map[string]string) (string, error) {
+	if valData == nil {
+		// this is expected when there is no validation information, such as when
+		// the field is first shown to the user before it is submitted
+		log.Printf("validation data is nil for field '%s'", fieldName)
+		return "", nil
+	}
+
+	s, ok := valData[fieldName]
+	if !ok {
+		// this is expected if there is nothing wrong with the fields value per the validation rules
+		log.Printf("no entry for field '%s'", fieldName)
+		return "", nil
+	}
+	return s, nil
+
 }
 
 type FormField struct {

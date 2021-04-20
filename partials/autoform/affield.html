@@ -1,0 +1,26 @@
+{{ define "afField" }}
+	<div class="mb-3">
+		<label for="{{.field.Name}}" class="form-label">{{.field.Name}}</label>
+        {{ if eq .field.InputType "textarea" }}
+			<textarea class="{{.field.InputClass}}" name="{{.field.Name}}" rows="3">{{.field.Data}}</textarea>
+        {{else}}
+			<input
+					type="{{.field.InputType}}"
+					class="{{.field.InputClass}} {{isValid .field.Name (index . "validation")}}"
+					name="{{.field.Name}}"
+                    {{if eq .field.InputType "checkbox"}}
+						value="true"
+                        {{if .field.Data}}
+							checked="checked"
+                        {{end}}
+                    {{else}}
+						value="{{.field.Data}}"
+                    {{end}}
+			>
+        {{end}}
+		<div class="invalid-feedback">
+            {{getValMessage .field.Name (index . "validation")}}
+		</div>
+	</div>
+
+{{end}}

@@ -2,6 +2,9 @@ package project
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
+	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
 	"github.com/techplexengineer/gorm-roboparts/helpers"
 	"github.com/techplexengineer/gorm-roboparts/models"
@@ -39,11 +42,37 @@ func (o *Controller) CreatePOST(c echo.Context) error {
 		return err
 	}
 	err = c.Validate(proj) //@todo show the errors to the user in a nice way
+
+	// validationData contains a map of field names to error strings
+	validationData := map[string]string{}
 	if err != nil {
-		helpers.SetErrorFlash(c, err.Error())
-		data := map[string]interface{}{
-			"project": proj,
+		if _, ok := err.(*validator.InvalidValidationError); ok {
+			log.Printf("invalidValidationError - %s\n", err)
+
+		} else {
+			var valErrs validator.ValidationErrors
+			if errors.As(err, &valErrs) {
+				for _, err := range valErrs {
+					errString := ""
+					if err.Tag() == "required" {
+						errString = fmt.Sprintf("%s is required", err.Field())
+					} else {
+						errString = fmt.Sprintf("'%s' failed the '%s' check", err.Field(), err.Tag())
+					}
+
+					validationData[err.Field()] = errString
+				}
+				helpers.SetErrorFlash(c, "Form data is invalid. Please correct the errors below.")
+			} else {
+				log.Printf("not a validator.ValidationErrors")
+			}
 		}
+
+		data := map[string]interface{}{
+			"project":    proj,
+			"validation": validationData,
+		}
+		// we had validation errors, send them back to the user so they can fix the field.
 		return c.Render(http.StatusOK, "create.html", data)
 	}
 
@@ -82,20 +111,8 @@ func (o *Controller) ListGET(c echo.Context) error {
 	var projects []models.Project
 	o.db.Find(&projects) //probably want to add a limit
 	data := map[string]interface{}{
-		//"columns": []string{
-		//	"ID",
-		//	"name",
-		//	"part_prefix",
-		//	"archived",
-		//	"notes",
-		//	"parts",
-		//	"orders",
-		//	"CreatedAt",
-		//	"UpdatedAt",
-		//	"DeletedAt",
-		//},
 		"projects": projects,
 	}
-	log.Printf("ListGET Data: %#v", data)
+
 	return c.Render(http.StatusOK, "list.html", data)
 }

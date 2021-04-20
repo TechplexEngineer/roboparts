@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -32,9 +31,9 @@ type CustomValidator struct {
 }
 
 func (cv *CustomValidator) Validate(i interface{}) error {
-	log.Printf("Validate %#v", i)
+	//log.Printf("Validate %#v", i)
 	if err := cv.validator.Struct(i); err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return err
 	}
 	return nil
 }
@@ -113,7 +112,7 @@ func main() {
 
 	// Middleware
 	//e.Use(middleware.Logger()) // quite verbose
-	e.Use(middleware.Recover())
+	//e.Use(middleware.Recover())
 
 	//e.Logger.SetLevel(log.DEBUG)
 	e.Renderer = &helpers.TemplateRenderer{}

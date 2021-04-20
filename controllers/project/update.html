@@ -3,9 +3,11 @@
 		<a href="{{pathFor `projects`}}" class="btn btn-success float-end">All Projects</a>
 		<h1>Edit Project: {{.project.Name}}</h1>
 
-		<form action="{{ pathFor "project_edit" }}">
+		<pre>{{. | jsonify }}</pre>
+
+		<form action="{{ pathFor "project_edit" }}" method="POST">
             {{ range members .project }}
-                {{ template "afField" . }}
+                {{ template "afField" (createMap "field" . "validation" $.valData) }}
             {{ end }}
 			<button type="submit" class="btn btn-success">Submit</button>
 			<a href="{{pathFor `projects`}}" class="btn btn-danger float-end">Cancel</a>

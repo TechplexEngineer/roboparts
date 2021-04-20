@@ -5,7 +5,7 @@
 
 		<form action="{{ pathFor "project_new" }}" method="POST">
             {{ range members .project }}
-                {{ template "afField" . }}
+                {{ template "afField" (createMap "field" . "validation" $.validation) }}
             {{ end }}
 			<button type="submit" class="btn btn-success">Submit</button>
 			<a href="{{pathFor `projects`}}" class="btn btn-danger float-end">Cancel</a>
