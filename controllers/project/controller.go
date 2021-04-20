@@ -1,7 +1,6 @@
 package project
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/go-playground/validator"
@@ -76,11 +75,9 @@ func (o *Controller) CreatePOST(c echo.Context) error {
 		return c.Render(http.StatusOK, "create.html", data)
 	}
 
-	indent, err := json.MarshalIndent(proj, "", "    ")
-	if err != nil {
-		return err
-	}
-	log.Printf("Data: %s", indent)
+	// gorm does magic to generate uuid and sets created_at and updated_at
+	res := o.db.Create(&proj)
+	log.Printf("Created: %#v", res)
 
 	data := map[string]interface{}{
 		"project": models.Project{},

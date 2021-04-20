@@ -186,14 +186,14 @@ func getValMessage(fieldName string, valData map[string]string) (string, error) 
 	if valData == nil {
 		// this is expected when there is no validation information, such as when
 		// the field is first shown to the user before it is submitted
-		log.Printf("validation data is nil for field '%s'", fieldName)
+		//log.Printf("validation data is nil for field '%s'", fieldName)
 		return "", nil
 	}
 
 	s, ok := valData[fieldName]
 	if !ok {
 		// this is expected if there is nothing wrong with the fields value per the validation rules
-		log.Printf("no entry for field '%s'", fieldName)
+		//log.Printf("no entry for field '%s'", fieldName)
 		return "", nil
 	}
 	return s, nil
