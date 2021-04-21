@@ -138,9 +138,9 @@ func main() {
 	e.GET("/projects", pc.ListGET).Name = "projects"
 	e.GET("/project/new", pc.CreateGET).Name = "project_new"
 	e.POST("/project/new", pc.CreatePOST)
-	e.GET("/project/:id", pc.Read).Name = "project"
-	e.GET("/project/edit/:id", pc.Update).Name = "project_edit"
-	e.POST("/project/edit/:id", pc.Update)
+	e.GET("/project/:id", pc.ReadGET).Name = "project"
+	e.GET("/project/edit/:id", pc.UpdateGET).Name = "project_edit"
+	e.POST("/project/edit/:id", pc.UpdatePOST)
 	e.GET("/project/delete/:id", pc.Delete).Name = "project_delete"
 	e.DELETE("/project/delete/:id", pc.Delete)
 

@@ -6,7 +6,7 @@ import (
 
 type Project struct {
 	Common
-	Name       string   `json:"name"        form:"Name"       validate:"required"`
+	Name       string   `json:"name"        form:"Name"       validate:"required"   gorm:"uniqueIndex"`
 	PartPrefix string   `json:"part_prefix" form:"PartPrefix" validate:"required"`
 	Archived   bool     `json:"archived"    form:"Archived"`
 	Notes      string   `json:"notes"       form:"Notes"      ui:"textarea"`
